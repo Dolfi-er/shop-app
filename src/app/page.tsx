@@ -65,9 +65,9 @@ export default function Home() {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Каталог товаров</h1>
-        <Link href="/admin" className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+        {/*<Link href="/admin" className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
           Панель администратора
-        </Link>
+        </Link>*/}
       </div>
 
       <CategoryFilter
