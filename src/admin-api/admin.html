@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ панель</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <div id="app" class="container mx-auto px-4 py-8">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold">Панель администратора</h1>
+            <a href="http://localhost:3000" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
+                Вернуться в каталог
+            </a>
+        </div>
+
+        <!-- Форма добавления товара -->
+        <div class="mb-6">
+            <button id="showAddForm" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+                Добавить товар
+            </button>
+        </div>
+
+        <div id="addProductForm" class="hidden bg-white p-6 rounded-lg shadow-md mb-6">
+            <h2 class="text-xl font-semibold mb-4">Добавить новый товар</h2>
+            <form id="productForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Название</label>
+                    <input type="text" name="name" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Цена</label>
+                    <input type="number" name="price" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Описание</label>
+                    <textarea name="description" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Категории</label>
+                    <div id="categoriesContainer" class="mt-1 space-y-2">
+                        <!-- Категории будут добавлены через JavaScript -->
+                    </div>
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" id="cancelAdd" class="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
+                        Отмена
+                    </button>
+                    <button type="submit" class="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700">
+                        Добавить
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Таблица товаров -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Название
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Цена
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Категории
+                        </th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Действия
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="productsTableBody" class="bg-white divide-y divide-gray-200">
+                    <!-- Товары будут добавлены через JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        let products = [];
+        let categories = [];
+
+        // Загрузка товаров и категорий
+        async function loadData() {
+            try {
+                const response = await fetch('/api/products');
+                const data = await response.json();
+                products = data.products;
+                categories = data.categories;
+                renderProducts();
+                renderCategories();
+            } catch (error) {
+                console.error('Ошибка при загрузке данных:', error);
+            }
+        }
+
+        // Отображение товаров
+        function renderProducts() {
+            const tbody = document.getElementById('productsTableBody');
+            tbody.innerHTML = products.map(product => `
+                <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm font-medium text-gray-900">${product.name}</div>
+                        <div class="text-sm text-gray-500">${product.description.substring(0, 50)}...</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${product.price.toLocaleString()} ₽</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex flex-wrap gap-1">
+                            ${product.categories.map(categoryId => {
+                                const category = categories.find(c => c.id === categoryId);
+                                return `<span class="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-xs">
+                                    ${category ? category.name : categoryId}
+                                </span>`;
+                            }).join('')}
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button onclick="editProduct('${product.id}')" class="text-blue-600 hover:text-blue-900 mr-4">
+                            Редактировать
+                        </button>
+                        <button onclick="deleteProduct('${product.id}')" class="text-red-600 hover:text-red-900">
+                            Удалить
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Отображение категорий в форме
+        function renderCategories() {
+            const container = document.getElementById('categoriesContainer');
+            container.innerHTML = categories.map(category => `
+                <label class="flex items-center">
+                    <input type="checkbox" name="categories" value="${category.id}" 
+                           class="rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                    <span class="ml-2">${category.name}</span>
+                </label>
+            `).join('');
+        }
+
+        // Удаление товара
+        async function deleteProduct(id) {
+            if (!confirm('Вы уверены, что хотите удалить этот товар?')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/products/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Ошибка при удалении товара');
+                }
+
+                await loadData();
+            } catch (error) {
+                console.error('Ошибка при удалении товара:', error);
+                alert('Произошла ошибка при удалении товара');
+            }
+        }
+
+        // Показать/скрыть форму добавления товара
+        document.getElementById('showAddForm').addEventListener('click', () => {
+            document.getElementById('addProductForm').classList.remove('hidden');
+        });
+
+        document.getElementById('cancelAdd').addEventListener('click', () => {
+            document.getElementById('addProductForm').classList.add('hidden');
+            document.getElementById('productForm').reset();
+        });
+
+        // Обработка отправки формы
+        document.getElementById('productForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const selectedCategories = Array.from(formData.getAll('categories'));
+
+            const productData = {
+                name: formData.get('name'),
+                price: parseFloat(formData.get('price')),
+                description: formData.get('description'),
+                categories: selectedCategories
+            };
+
+            try {
+                const response = await fetch('/api/products', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(productData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Ошибка при добавлении товара');
+                }
+
+                await loadData();
+                document.getElementById('addProductForm').classList.add('hidden');
+                e.target.reset();
+            } catch (error) {
+                console.error('Ошибка при добавлении товара:', error);
+                alert('Произошла ошибка при добавлении товара');
+            }
+        });
+
+        // Загрузка данных при загрузке страницы
+        loadData();
+    </script>
+</body>
+</html>

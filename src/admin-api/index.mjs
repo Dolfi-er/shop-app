@@ -13,6 +13,10 @@ const PORT = 8080;
 app.use(express.json());
 app.use(cors());
 
+// Добавляем обработку статических файлов
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin.html'));
+});
 const productsFilePath = path.join(__dirname, 'products.json');
 
 // Получить все товары
@@ -174,6 +178,7 @@ app.get('/api/categories', async (req, res) => {
 
 app.listen(PORT, () => {
   console.log(`Сервер панели администратора запущен на порту ${PORT}`);
+  console.log(`Админ панель доступна по адресу: http://localhost:${PORT}/admin`);
 });
 
 // Для тестирования
