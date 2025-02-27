@@ -1,0 +1,69 @@
+{
+  "products": [
+    {
+      "id": "1",
+      "name": "Смартфон XYZ Pro",
+      "price": 29999,
+      "description": "Мощный смартфон с 8 ГБ оперативной памяти и 128 ГБ встроенной памяти",
+      "categories": [
+        "electronics"
+      ]
+    },
+    {
+      "id": "2",
+      "name": "Ноутбук UltraBook",
+      "price": 59999,
+      "description": "Легкий и производительный ноутбук для работы и развлечений",
+      "categories": [
+        "electronics"
+      ]
+    },
+    {
+      "id": "3",
+      "name": "Футболка Classic",
+      "price": 1299,
+      "description": "Классическая хлопковая футболка, доступна в разных цветах",
+      "categories": [
+        "clothing"
+      ]
+    },
+    {
+      "id": "4",
+      "name": "Джинсы Comfort",
+      "price": 2499,
+      "description": "Удобные джинсы из качественного денима",
+      "categories": [
+        "clothing"
+      ]
+    },
+    {
+      "id": "5",
+      "name": "Умные часы FitTrack",
+      "price": 8999,
+      "description": "Смарт-часы с функцией отслеживания активности и уведомлений",
+      "categories": [
+        "electronics",
+        "clothing"
+      ]
+    },
+    {
+      "name": "Супер швабра",
+      "price": 10000,
+      "description": "Она уберет все",
+      "categories": [
+        "electronics"
+      ],
+      "id": "1740653735458"
+    }
+  ],
+  "categories": [
+    {
+      "id": "electronics",
+      "name": "Электроника"
+    },
+    {
+      "id": "clothing",
+      "name": "Одежда"
+    }
+  ]
+}
